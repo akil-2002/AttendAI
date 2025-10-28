@@ -18,6 +18,8 @@ Or launch the interactive menu and follow the prompts:
 python job_tracker.py
 ```
 
+If you're running the tool from a non-interactive environment, the same command will simply print your saved applications.
+
 #### Add a new application
 
 ```bash

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from dataclasses import dataclass, asdict
 from pathlib import Path
 from types import SimpleNamespace
@@ -143,7 +144,11 @@ def main(argv: Optional[List[str]] = None) -> None:
     args = parser.parse_args(argv)
 
     if not getattr(args, "command", None):
-        interactive_prompt()
+        if sys.stdin.isatty():
+            interactive_prompt()
+        else:
+            print("No subcommand provided; showing saved applications. Use --help for commands.")
+            list_applications(SimpleNamespace())
         return
 
     args.func(args)
