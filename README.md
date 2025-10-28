@@ -20,6 +20,14 @@ python job_tracker.py
 
 If you're running the tool from a non-interactive environment, the same command will simply print your saved applications.
 
+Feeling playful? Chase your applications in a tiny maze inspired by Pac-Man:
+
+```bash
+python job_tracker.py play
+```
+
+Move with the arrow keys (or WASD) to collect each application's pellet and review its details.
+
 #### Add a new application
 
 ```bash
