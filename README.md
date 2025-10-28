@@ -12,6 +12,12 @@ Run the tool with Python:
 python job_tracker.py list
 ```
 
+Or launch the interactive menu and follow the prompts:
+
+```bash
+python job_tracker.py
+```
+
 #### Add a new application
 
 ```bash

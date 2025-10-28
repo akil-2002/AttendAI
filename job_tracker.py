@@ -7,6 +7,7 @@ import argparse
 import json
 from dataclasses import dataclass, asdict
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Dict, Iterable, List, Optional
 
 
@@ -106,8 +107,11 @@ def delete_application(args: argparse.Namespace) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Track job applications in a local JSON file.")
-    subparsers = parser.add_subparsers(dest="command", required=True)
+    parser = argparse.ArgumentParser(
+        description="Track job applications in a local JSON file.",
+        epilog="Run without subcommands to open the interactive prompt.",
+    )
+    subparsers = parser.add_subparsers(dest="command")
 
     add_parser = subparsers.add_parser("add", help="Add a new job application")
     add_parser.add_argument("company", help="Company name")
@@ -137,7 +141,82 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: Optional[List[str]] = None) -> None:
     parser = build_parser()
     args = parser.parse_args(argv)
+
+    if not getattr(args, "command", None):
+        interactive_prompt()
+        return
+
     args.func(args)
+
+
+def interactive_prompt() -> None:
+    """Simple REPL that lets users manage applications without subcommands."""
+
+    MENU = (
+        "\nJob Application Tracker",
+        "1) List applications",
+        "2) Add application",
+        "3) Update application",
+        "4) Delete application",
+        "5) Quit",
+    )
+
+    while True:
+        print("\n".join(MENU))
+        choice = input("Select an option (1-5): ").strip()
+
+        if choice == "1":
+            list_applications(SimpleNamespace())
+        elif choice == "2":
+            company = input("Company: ").strip()
+            position = input("Position: ").strip()
+            status = input("Status [Applied]: ").strip() or "Applied"
+            notes = input("Notes (optional): ").strip()
+            add_application(
+                SimpleNamespace(
+                    company=company,
+                    position=position,
+                    status=status,
+                    notes=notes,
+                )
+            )
+        elif choice == "3":
+            try:
+                index = int(input("Entry number to update: ").strip())
+            except ValueError:
+                print("Please enter a valid number.")
+                continue
+            company = input("New company (leave blank to keep current): ").strip() or None
+            position = input("New position (leave blank to keep current): ").strip() or None
+            status = input("New status (leave blank to keep current): ").strip() or None
+            notes = input("New notes (leave blank to keep current, type '-' to clear): ").strip()
+            if notes == "":
+                notes_value = None
+            elif notes == "-":
+                notes_value = ""
+            else:
+                notes_value = notes
+            update_application(
+                SimpleNamespace(
+                    index=index,
+                    company=company,
+                    position=position,
+                    status=status,
+                    notes=notes_value,
+                )
+            )
+        elif choice == "4":
+            try:
+                index = int(input("Entry number to delete: ").strip())
+            except ValueError:
+                print("Please enter a valid number.")
+                continue
+            delete_application(SimpleNamespace(index=index))
+        elif choice == "5":
+            print("Goodbye!")
+            break
+        else:
+            print("Choose an option between 1 and 5.")
 
 
 if __name__ == "__main__":
